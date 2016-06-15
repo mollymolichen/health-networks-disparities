@@ -64,7 +64,7 @@ function boolSearch(){
     // makeUnique(retresult);
 
     displayRes(result);
-    makeUnique(result);
+    //makeUnique(result);
 
   } else {
     stringMatch(res);
