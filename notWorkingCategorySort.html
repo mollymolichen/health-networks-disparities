@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Category Sort</title>
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js" type = "text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+    <script src = "http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="my5000Nodes.js" type="text/javascript"></script>
+    <script>
+     /*
+      //load JSON file into array
+      $.getJSON("my5000Entries.json", function(json){
+        var myArray = [];   //array of only node_IDs as integers!!!
+        
+        /*
+        //method 1 - don't understand
+        $(each(json, function(key, val1)){
+            myArray.push("<li> <a href=#'" + key + "'>" + val1 + "> </a> <li>");
+        };
+
+        //method 2 - refine!
+        for (var key in json){
+            if (json.hasOwnProperty(key)){
+                var item = json[key];
+                myArray.push({
+                    age: item.age,
+                    gender: item.gender, 
+                    node_ID: item.node_ID,
+                    occurs: item.occurs,
+                    race_ethn: item.race_ethn
+                });
+            }
+        }
+
+        for (var item = 0; item < myArray.length; item++){
+            document.write(myArray[item]);
+        }
+      });
+
+      /* ALSO DONT UNDERSTAND
+      $("<ul/>", {"class":"my-new-list", html: items.join("")}.appendTo("body");
+        });*/
+
+      //group based on frequency counts done in Excel
+      //categories, subcategories included
+      function categorize(){
+          var category;       //all those designated by ICD-9
+          var largeCategory;  //4-6, integer form?
+
+          for (var i = 0; i < nodes.length; i++){
+              var currIndex = nodes[i].node_ID; 
+              if (currIndex == 0) return error;
+              if (currIndex > 0 && currIndex <= 139){
+                  category = "Infections and Parasitic Diseases";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 140 && currIndex <= 239){
+                  category = "Neoplasms";
+                  largeCategory = "Clinical Diagnostics";
+              }
+              if (currIndex >= 240 && currIndex <= 279){
+                  category = "Endocrine, Nutritional and Metabolic Diseases, and Immunity Disorders";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 280 && currIndex <= 289){
+                  category = "Diseases of the Blood and Blood-Forming Organs";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 290 && currIndex <= 319){
+                  category = "Mental Disorders";
+                  largeCategory = "Nervous System and Psychological Disorders";
+              }
+              if (currIndex >= 320 && currIndex <= 389){
+                  category = "Diseases of the Nervous System and Sense Organs";
+                  largeCategory = "Nervous System and Psychological Disorders";
+              }
+              if (currIndex >= 390 && currIndex <= 459){
+                  category = "Diseases of the Circulatory System";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 460 && currIndex <= 519){
+                  category = "Diseases of the Respiratory System";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 520 && currIndex <= 579){
+                  category = "Diseases of the Digestive System";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 580 && currIndex <= 629){
+                  category = "Diseases of the Genitourinary System";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 630 && currIndex <= 679){
+                  category = "Complications of Pregnancy, Childbirth, and the Puerperium";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 680 && currIndex <= 709){
+                  category = "Diseases of the Skin and Subcutaneous Tissue";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 710 && currIndex <= 739){
+                  category = "Diseases of the Musculoskeletal System and Connective Tissue";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 740 && currIndex <= 759){
+                  category = "Congenital Anomalies";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 760 && currIndex <= 779){
+                  category = " Certain Conditions Originating in the Perinatal Period";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 780 && currIndex <= 799){
+                  category = "Symptoms, Signs, and Ill-Defined Conditions";
+                  largeCategory = "Clinical Diagnostics";
+              }
+              if (currIndex >= 800 && currIndex <= 999){
+                  category = "Injury and Poisoning";
+                  largeCategory = "Injury and Poisoning";
+              }
+              if (currIndex.includes("E")){
+                  category = "Supplementary Classification of External Causes of Injury and Poisoning";
+                  largeCategory = "Injury and Poisoning";
+              }
+              if (currIndex.includes("V")){
+                  category = "Supplementary Classification of Factors Influencing Health Status and Contact with Health Services";
+                  largeCategory = "Clinical Diagnostics";
+              }
+
+              //write each node's category - should amount to 5000 entries
+              //document.write("Node " + i + " belongs to subcategory " + category + " within " + largeCategory);
+            }
+          }
+        
+
+        for (var j=0; j<10; j++){
+            var pos = nodes[j];
+            document.write("Oh no! Alas! A " + pos.age + " year old " + pos.race_ethn + " " + pos.gender + " has diagnosis " + pos.node_ID + "!" );
+        }
+
+        //call the categorize function
+        categorize();
+    </script>
+</body>
+</html>

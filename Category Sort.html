@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Category Sort</title>
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js" type = "text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+    <script src = "http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src = "d3.js"></script>
+    <script src="my5000Nodes.js" type="text/javascript"></script>
+    <script>
+    //global variables
+    var category;       //all those designated by ICD-9
+    var largeCategory;  //4-6, integer form?
+
+      //load data
+      /*d3.json("my5000Entries.json", function(error, data){
+          for (var d in data){
+              d.age = d.age;
+              d.gender = d.gender;
+              d.node_ID = d.node_ID;
+              d.occurs = d.occurs;
+              d.race_ethn = d.race_ethn;
+              //not sure
+              d.category = d.category;
+              d.largeCategory = d.largeCategory;
+          }
+          categorize(nodes);
+          console.log("Is this working");
+          visualize(data);
+
+      });*/
+
+      document.write(nodes[0].age);
+
+      //visualize the data using a crude force-driven network
+      function visualize(error, sourceArr){
+          var nodeHash = {};
+          var nodes = [];
+          var edges = [];
+
+          for (var edge in sourceArr){
+            if (!nodeHash[edge.source]) {
+              nodeHash[edge.source] = {id: edge.source, label: edge.source};
+              nodes.push(nodeHash[edge.source]);
+            }
+            if (!nodeHash[edge.target]) {
+              nodeHash[edge.target] = {id: edge.target, label: edge.target};
+              nodes.push(nodeHash[edge.target]);
+            }
+            edges.push({source: nodeHash[edge.source], target: nodeHash[edge.target], weight: edge.weight});
+          }
+
+          var force = d3.layout.force().nodes(nodes).links(edges)
+          .size([500,500])
+          .charge(-200)
+          .linkDistance(100)
+          .on("tick", updateNetwork);
+
+          d3.select("svg").selectAll("line")
+          .data(edges)
+          .enter()
+          .append("line")
+          .style("stroke-width", "1px")
+          .style("stroke", "#CC9999");
+
+          d3.select("svg").selectAll("circle")
+          .data(nodes)
+          .enter()
+          .append("circle")
+          .style("fill", "#996666")
+          .attr("r", 5);
+
+          force.start();
+
+          function updateNetwork() {
+            d3.select("svg").selectAll("line")
+              .attr("x1", function (d) {return d.source.x})
+              .attr("x2", function (d) {return d.target.x})
+              .attr("y1", function (d) {return d.source.y})
+              .attr("y2", function (d) {return d.target.y});
+
+            d3.select("svg").selectAll("circle")
+              .attr("cx", function (d) {return d.x})
+              .attr("cy", function (d) {return d.y});
+              
+            }
+        }
+
+      //group based on frequency counts done in Excel
+      //categories, subcategories included
+      function categorize(nodes){
+          for (var i = 0; i < nodes.length; i++){
+              var currIndex = nodes[i].node_ID; 
+              if (currIndex == 0) return error;
+              if (currIndex > 0 && currIndex <= 139){
+                  category = "Infections and Parasitic Diseases";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 140 && currIndex <= 239){
+                  category = "Neoplasms";
+                  largeCategory = "Clinical Diagnostics";
+              }
+              if (currIndex >= 240 && currIndex <= 279){
+                  category = "Endocrine, Nutritional and Metabolic Diseases, and Immunity Disorders";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 280 && currIndex <= 289){
+                  category = "Diseases of the Blood and Blood-Forming Organs";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 290 && currIndex <= 319){
+                  category = "Mental Disorders";
+                  largeCategory = "Nervous System and Psychological Disorders";
+              }
+              if (currIndex >= 320 && currIndex <= 389){
+                  category = "Diseases of the Nervous System and Sense Organs";
+                  largeCategory = "Nervous System and Psychological Disorders";
+              }
+              if (currIndex >= 390 && currIndex <= 459){
+                  category = "Diseases of the Circulatory System";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 460 && currIndex <= 519){
+                  category = "Diseases of the Respiratory System";
+                  largeCategory = "Circulatory/Respiratory Systems";
+              }
+              if (currIndex >= 520 && currIndex <= 579){
+                  category = "Diseases of the Digestive System";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 580 && currIndex <= 629){
+                  category = "Diseases of the Genitourinary System";
+                  largeCategory = "Regulatory Systems";
+              }
+              if (currIndex >= 630 && currIndex <= 679){
+                  category = "Complications of Pregnancy, Childbirth, and the Puerperium";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 680 && currIndex <= 709){
+                  category = "Diseases of the Skin and Subcutaneous Tissue";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 710 && currIndex <= 739){
+                  category = "Diseases of the Musculoskeletal System and Connective Tissue";
+                  largeCategory = "Integumentary System";
+              }
+              if (currIndex >= 740 && currIndex <= 759){
+                  category = "Congenital Anomalies";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 760 && currIndex <= 779){
+                  category = " Certain Conditions Originating in the Perinatal Period";
+                  largeCategory = "Reproductive System";
+              }
+              if (currIndex >= 780 && currIndex <= 799){
+                  category = "Symptoms, Signs, and Ill-Defined Conditions";
+                  largeCategory = "Clinical Diagnostics";
+              }
+              if (currIndex >= 800 && currIndex <= 999){
+                  category = "Injury and Poisoning";
+                  largeCategory = "Injury and Poisoning";
+              }
+              if (currIndex.includes("E")){
+                  category = "Supplementary Classification of External Causes of Injury and Poisoning";
+                  largeCategory = "Injury and Poisoning";
+              }
+              if (currIndex.includes("V")){
+                  category = "Supplementary Classification of Factors Influencing Health Status and Contact with Health Services";
+                  largeCategory = "Clinical Diagnostics";
+              }
+
+              //write each node's category - should amount to 5000 entries
+              document.write("Node " + i + " belongs to subcategory " + category + " within " + largeCategory);
+            }
+          }
+        //test
+        for (var j=0; j<10; j++){
+            var pos = nodes[j];
+            document.write(pos.category);
+        }
+
+    </script>
+</body>
+</html>

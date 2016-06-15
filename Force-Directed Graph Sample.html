@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+</head>
+<body>
+  <script type="text/coffeescript"></script>
+  <script>
+  # Removes nodes from input array
+  # based on current filter setting.
+  # Returns array of nodes
+  filterNodes = (allNodes) ->
+    filteredNodes = allNodes
+    if filter == "popular" or filter == "obscure"
+      playcounts = allNodes.map((d) -> d.playcount).sort(d3.ascending)
+      cutoff = d3.quantile(playcounts, 0.5)
+      filteredNodes = allNodes.filter (n) ->
+        if filter == "popular"
+          n.playcount > cutoff
+        else if filter == "obscure"
+          n.playcount <= cutoff
+    filteredNodes
+
+    # Public function to update highlighted nodes from search
+network.updateSearch = (searchTerm) ->
+  searchRegEx = new RegExp(searchTerm.toLowerCase())
+  node.each (d) ->
+    element = d3.select(this)
+    match = d.name.toLowerCase().search(searchRegEx)
+    if searchTerm.length > 0 and match >= 0
+      element.style("fill", "#F38630")
+        .style("stroke-width", 2.0)
+        .style("stroke", "#555")
+      d.searched = true
+    else
+      d.searched = false
+      element.style("fill", (d) -> nodeColors(d.artist))
+        .style("stroke-width", 1.0)
+
+    </script>
+</body>
+</html>

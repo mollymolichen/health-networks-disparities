@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Form Menu Options</title>
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js" type = "text/javascript" charset="utf-8"></script>
+</head>
+
+<body>
+    <form name="menuOptions">
+        <label>Sort By ICD-9 Disease Categories: </label>
+        
+        <!--Form with Drop Down Single Selection-->
+        <select name="ICD9cats">
+            <option value="Mental Disorders" selected>Mental Disorders (290-319)</option>
+            <option value="Nervous System" selected>Nervous System (320-389)</option>
+            <option value="Circulatory System" selected>Circulatory System (390-459)</option>
+            <option value="Respiratory System" selected>Respiratory System (460-519)</option>
+            <option value="Digestive System" selected>Digestive System (520-579)</option>
+        </select>
+
+        <!--Button to display results based on user's choice-->
+        <input type="button" value="Click to Sort" onClick = "processMenu()"/>
+    </form>
+
+    <div id="userChoice"></div>
+
+    <!--JavaScript is in the same file-->
+    <script type="text/javascript"> 
+        function processMenu(){
+            var choice = document.menuOptions.ICD9cats.value;
+            var strOutput = '<div>Displaying Results for Category ' + choice + '</div>';
+            document.getElementById("userChoice").innerHTML += strOutput;
+            return choice;
+        }
+
+        function displayMap(){
+            console.log("See if value retained from prev" + choice);
+            if (choice == "Mental Disorders"){
+                
+            }
+            else if (choice == "Nervous System"){
+
+            }
+            else if (choice == "Nervous System"){
+              
+            }
+            else if (choice == "Nervous System"){
+              
+            }
+            else if (choice == "Nervous System"){
+              
+            }
+            else {
+                console.log("Not a valid category, please choose again.");
+            }
+
+        }
+    </script>
+
+</body>

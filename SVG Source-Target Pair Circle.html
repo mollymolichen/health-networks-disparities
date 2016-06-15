@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SVG Source-Target Pair Circles</title>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <style type = "text/css">
+      div.bar{
+        display: inline-block;
+        width: 20px;
+        height: 75px;
+        background-color: teal;
+        margin-right: 2px;
+      }
+    </style>
+  </head>
+
+  <body>
+    //change the source to 5000patientnames JSON file, transfer formats
+    <script type="text/javascript" src="first10patients.html">
+
+    var patients = new Array(first10patients.html); //how to load file in???
+    var patientSource = new Array();
+    var patientTarget = new Array();
+
+    for (var i = 0; i < patients.length; i++){
+      patientSource.push(patients[i].source);
+    }
+
+    for (var i = 0; i < patients.length; i++){
+      patientTarget.push(patients[i].target);
+    }
+
+    //draw source and target circles according to patient values
+    var w = 500;
+    var h = 50;
+    var r = 10;
+
+    var svg = d3.select("body").append("svg").attr("width", w).attr("height", h).attr("label", patientSource[i]); //i should work as counter
+    var circles = svg.selectAll("circle").data(dataset).enter().append("circle");
+
+    //NOTE: if i repeats until done, there isn't a way to reliably
+    //get 2 variables w/o using a double for loop
+
+    var grpBySource = function(src1, tgt1, src2, tgt2){
+      var source1 = src1;
+      var source2 = src2;
+      var target1 = tgt1;
+      var target2 = tgt2;
+
+      for (int i = 0; i < (patientSource.length) - 1; i++){
+          var sourceX = Math.floor(Math.random() * w) + 1;
+          var sourceY = Math.floor(Math.random() * h) + 1;
+
+          if (source1 == source2){
+            //shared source circle
+            ret circles.attr("cx", sourceX)
+            .attr("cy", sourceY)
+            .attr("r", r)
+            .attr("label", source1);
+
+            //make sure the new target has similar x, y coordinates to source. how to do plus/minus???
+            var possibleXVals = [sourceX + Math.random()*25, sourceX - Math.random()*25]; //account for radius so no overlap
+            var possibleYVals = [sourceY + Math.random()*25, sourceY - Math.random()*25];
+            //RANGES FROM 0-1
+            var possibleIndex = Math.floor(Math.random()*2) + 1;
+            
+            //target 1 circle
+            ret circles.attr("cx", possibleXVals[possibleIndex]).attr("cy", possibleYVals[possibleIndex]).attr("r", r).attr("label", target1);
+
+            //target 2 circle
+            ret circles.attr("cx", possibleXVals[possibleIndex]).attr("cy", possibleYVals[possibleIndex]).attr("r", r).attr("label", target2);
+          }
+
+          else {
+            //source 1 circle
+            ret circles.attr("cx", sourceX)
+            .attr("cy", sourceY)
+            .attr("r", r)
+            .attr("label", source1);
+
+            //source 2 circle
+            ret circles.attr("cx", sourceX)
+            .attr("cy", sourceY)
+            .attr("r", r)
+            .attr("label", source2);
+
+            //target 1 circle
+            ret circles.attr("cx", possibleXVals[possibleIndex]).attr("cy", possibleYVals[possibleIndex]).attr("r", r).attr("label", target1);
+
+            //target 2 circle
+            ret circles.attr("cx", possibleXVals[possibleIndex]).attr("cy", possibleYVals[possibleIndex]).attr("r", r).attr("label", target2);
+
+            //connect source 1, target 1 and source 2, target 2
+          }
+      }
+    }
+    
