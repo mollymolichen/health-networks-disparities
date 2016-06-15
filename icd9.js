@@ -42,7 +42,7 @@ function boolSearch(){
     for(var key in wordMap){
       if(wordMap.hasOwnProperty(key)){
         var numwords = newKeys.length;
-        var threshold = numwords > 2 ? numwords - 1 : 2;
+        var threshold = numwords > 2 ? numwords : 2;
         if(wordMap[key] >= threshold){
          result.push(key);
         }
@@ -74,7 +74,6 @@ function boolSearch(){
 //take user's string input and return list of matching codes
 function stringMatch(result) {
   var newarr = [];
-  var myKeys = [];
   for (var key in datalist) {
     if (datalist.hasOwnProperty(key)) {
       var val = datalist[key];
@@ -92,31 +91,20 @@ function stringMatch(result) {
 }
 
 //take user's string input and return list of codes
-function stringMatch() {
+function stringMatch(result) {
   var newarr = [];
   var myKeys = [];
-
   /*var rawInput = document.getElementById('text-field').value;
   console.log('input: ' + rawInput);
   if(rawInput.length == 0){
     return [];
   }
-
   var input = stemmer(rawInput, true);*/
-
-  var input = document.getElementById('text-field').value;
-  console.log('input: ' + input);
-  if (input.length == 0){
-    return [];
-  }
-
-  var res = input.toLowerCase();
   for (var key in datalist) {
     if (datalist.hasOwnProperty(key)) {
       var val = datalist[key];
-      if (val.indexOf(res) > -1 || val.indexOf(key) > -1){ //if value matches search, word for word
-        newarr.push(key + " : " + val);
-        myKeys.push(key);
+      if (val.indexOf(result) > -1 || key.indexOf(result) > -1){
+        newarr.push(key + ":" + val);
       }
     }
   }
@@ -152,73 +140,46 @@ function stringMatch() {
   }*/
 
   console.log('newarr: ', newarr);
+  //makeUnique(newarr);
+  displayRes(newarr);
+  return newarr;
+}
 
   //show how many results were found
-  var resultCount = document.getElementById('resultCount');
-  resultCount.innerText = newarr.length + ' results found';
+  function displayRes(nArray){
+    var resultCount = document.getElementById('resultCount');
+    resultCount.innerText = nArray.length + ' results found';
 
-  //remove previous displays on screen in order to update
-  var newList = document.getElementById("search-results");
-  while (newList.hasChildNodes()){
-  	newList.removeChild(newList.firstChild); //other version didn't have ;
+    //remove previous displays on screen in order to update
+    var newList = document.getElementById("search-results");
+    while (newList.hasChildNodes()){
+    	newList.removeChild(newList.firstChild); //other version didn't have ;
+    }
+
+    //display list of matching results for user to select from
+    for (var i = 0; i < nArray.length; i++){
+    	(function(){
+    		var res = nArray[i];
+    		var info = res.split(":"); //keep this as an array so you can access more elements
+    		var key = info[0];				 //code
+    		var value = info[1];			//diagnosis - need to categorize
+    		var mod = '<strong>' + info[0] + '</strong>' + ' - ' + value[0].toUpperCase() + value.slice(1);
+    		var node = document.createElement("LI"); //create a list node
+    		var div = document.createElement("div"); //create a div element
+    		div.innerHTML = mod; //text that makes up 
+    		node.appendChild(div);
+    		div.className = 'result-item';
+    		document.getElementById('search-results').appendChild(node);
+    		node.addEventListener("click", function(){
+    			findCode(res);
+    		});
+    	}()); 
+    }
+    //return myKeys;
   }
 
-  //display list of matching results for user to select from
-  for (var i = 0; i < newarr.length; i++){
-  	(function(){
-  		var res = newarr[i];
-  		var info = res.split(":"); //keep this as an array so you can access more elements
-  		var key = info[0];				 //code
-  		var value = info[1];			//diagnosis - need to categorize
-  		var mod = '<strong>' + info[0] + '</strong>' + ' - ' + value[0].toUpperCase() + value.slice(1);
-  		var node = document.createElement("LI"); //create a list node
-  		var div = document.createElement("div"); //create a div element
-  		div.innerHTML = mod; //text that makes up 
-  		node.appendChild(div);
-  		div.className = 'result-item';
-  		document.getElementById('search-results').appendChild(node);
-  		node.addEventListener("click", function(){
-  			findCode(res);
-  		});
-  	}()); 
-  }
-  //return myKeys;
-}
-
-//display how many results were found
-function displayRes(nArray) {
-  var resultCount = document.getElementById('resultCount');
-  resultCount.innerText = nArray.length + ' results found';
-
-//remove all previous displays on screen in order to update
-  var newList = document.getElementById("search-results");
-  while (newList.hasChildNodes()) {
-    newList.removeChild(newList.firstChild);
-  }
-
-//display list of matching results for user to select from
-  for (var i = 0; i < nArray.length; i++) {
-    (function(){
-      var res = nArray[i];
-    var info = res.split(":");
-    var keycode = info[0];
-      var descrip = info[1];
-      var mod = '<strong>' + info[0] + '</strong>' + ' - '
-                  + descrip[0].toUpperCase() + descrip.slice(1);
-
-      var node = document.createElement ("LI");  // create a list node
-      var div = document.createElement('div');  // create div element
-      div.innerHTML = mod;              //what text makes up link element
-      node.appendChild(div);            //put link into list node
-      div.className = 'result-item';
-      document.getElementById('search-results').appendChild(node);
-      node.addEventListener('click', function(){
-        findCode(res);
-      });
-    }());
-  }
-}
-/*function displayResults(){
+//categorize each result
+function displayResults(){
   //is splitword local? is input (from icd9.js) accessible? look into dynamic file loading if doesn't work
   //see whether user input matches 25% of array entries
   /*if (splitWord.length = 1){
@@ -254,7 +215,7 @@ function displayRes(nArray) {
 }*/
 
 //function to return unique integers of search results for subCategory sort/display purposes
-function resultCategories(myArray){
+/*function resultCategories(myArray){
 
   //var unfiltered = [];
   //IF USING 3DIGIT LIST, DON'T NEED TO TRUNCATE
@@ -266,7 +227,7 @@ function resultCategories(myArray){
   }*/
 
   //remove duplicates
-  var filtered = myArray.filter(function(item, pos){
+  /*var filtered = myArray.filter(function(item, pos){
     return myArray.indexOf(item) == pos;
   });
   for (var item in filtered){
@@ -419,7 +380,6 @@ function makeUnique(codeArray) {
     var eachval = codeArray[j];
     var uniq = eachval.split(":")[0].split(".")[0];
 
-
     if (uniquearr.indexOf(uniq) == -1) {
       uniquearr.push(uniq);
     }
@@ -433,7 +393,7 @@ function makeUnique(codeArray) {
     function moveSlider(e){
       e.preventDefault();
       var pos = $(e.currentTarget).offset(),
-      posX = e.pageX - pos.left,
+      posX = e.pageX - pos.left/*,
       value = posX*100/$(e.currentTarget).outerWidth();
       
       if (posX >= 0 && posX <= $(e.currentTarget).outerWidth()){
