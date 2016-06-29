@@ -17,9 +17,9 @@
 		border-top: none;
 		border-bottom-right-radius: 10px;
 		-webkit-touch-callout: none; /* iOS Safari */
-	  -webkit-user-select: none;   /* Chrome/Safari/Opera */
-	  -moz-user-select: none;      /* Firefox */
-	  -ms-user-select: none;
+		-webkit-user-select: none;   /* Chrome/Safari/Opera */
+		-moz-user-select: none;      /* Firefox */
+		-ms-user-select: none;
 	}
 
 	#resultCount {
@@ -116,6 +116,29 @@
 	.tfclear{
 		clear:both;
 	}
+
+	
+
+	.link {
+	  stroke: #ccc;
+	}
+
+	.node text {
+	  pointer-events: none;
+	  font: 10px sans-serif;
+	}
+
+	#displayResult {
+		border: 1px solid black;
+		width: 960px;
+		height: 500px;
+		/*margin-top: 20px;*/
+		position: relative;
+		top: 100px;
+		z-index: 0;
+	}
+
+
 </style>
 </head>
 <body>
@@ -131,12 +154,20 @@
 		<div id="resultCount"></div>
 		<ul id = "search-results"></ul>
 	</div>
+	<div align="center" style="width:100%;">
+		<div id= "displayResult">
+	</div>
+	</div>
 
-	<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>-->
-	<!--<script src="mollyicd9.js"></script>-->
+	<script type="text/javascript" src="d3.min.js"></script>
+	<!--<script type="text/javascript" src="d3.geom.js"></script>
+	<script type="text/javascript" src="d3.layout.js"></script>-->
 	<script type="text/javascript" src="jquery.js"></script>
 	<script src="ICD_CODES.js"></script>
-	<script src="icd9.js"></script>
-	<!--<script src="test.js"></script>-->
+	<script src="icd9emily.js"></script>
+	<script src = "my5000Entries.js"></script>
+	<script src = "3digcodes.js"></script>
+	
+
 </body>
 </html>
