@@ -1,173 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Search Box</title>
+  <meta charsett="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+   <meta name="description" content="">
+   <meta name="viewport" content="width=device-width">
+  <title>Health Networks and Disparities | Home Page</title>
+  <!-- CSS style general template-->
+  <link rel="stylesheet" href="reset.css">
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pageStyle.css">
+
 <!-- CSS styles for standard search box -->
 <style type="text/css">
-	#search {
-		padding: 20px;
-		padding-bottom: 0;
-	}
-
-	#result-container {
-		display: none;
-		border: 1px solid black;
-		width: 420px;
-		margin-left: 20px;
-		border-top: none;
-		border-bottom-right-radius: 10px;
-		-webkit-touch-callout: none; /* iOS Safari */
-		-webkit-user-select: none;   /* Chrome/Safari/Opera */
-		-moz-user-select: none;      /* Firefox */
-		-ms-user-select: none;
-	}
-
-	#resultCount {
-		/*margin-left: 20px;*/
-		padding-left: 10px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-		border-bottom: 1px solid black;
-		width: 410px;
-		background-color: #B4CDCD;
-		color: white;
-		cursor: default;
-		font-size: 18px;
-	}
-
-	::-webkit-scrollbar {
-		background-color:rgba(0,0,0,0.2);
-		border-bottom-right-radius: 10px;
-		width: 8px;
-	}
-
-	::-webkit-scrollbar-thumb {
-		border-radius: 10px;
-		background-color: rgba(0,0,0,0.8);
+  #search {
+    padding: 20px;
+    padding-bottom: 0;
+  }
+  #result-container {
+    display: none;
+    border: 1px solid black;
+    width: 420px;
+    margin-left: 20px;
+    border-top: none;
+    border-bottom-right-radius: 10px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;
+  }
+  #resultCount {
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid black;
+    width: 410px;
+    background-color: #B4CDCD;
+    color: white;
+    cursor: default;
+    font-size: 18px;
+  }
+  ::-webkit-scrollbar {
+    background-color:rgba(0,0,0,0.2);
+    border-bottom-right-radius: 10px;
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(0,0,0,0.8);
     -webkit-box-shadow: inset 0 0 6px white;
-	}
-
-	#search-results {
-		list-style-type: none;
-		padding-left: 0;
-		margin: 0;
-		overflow: hidden;
-		overflow-y: scroll;
-		width: 420px;
-		height: 500px;
-	}
-
-	.input{
-		margin: 0;
-		margin-right: -4px;
-		padding: 5px;
-		width: 410px;
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 20px;
-		border: 1px solid #0076a3; border-right:0px;
-		border-top-left-radius: 5px 5px;
-		/*border-bottom-left-radius: 5px 5px;*/
-	}
-
-	.button {
-		margin: 0;
-		padding: 5px 15px;
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 20px;
-		outline: none;
-		cursor: pointer;
-		text-align: center;
-		text-decoration: none;
-		color: #ffffff;
-		border: solid 1px #0076a3; border-right:0px;
-		background: #0095cd;
-		background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
-		background: -moz-linear-gradient(top,  #00adee,  #0078a5);
-		border-top-right-radius: 5px 5px;
-		border-bottom-right-radius: 5px 5px;
-	}
-	.button:hover {
-		text-decoration: none;
-		background: #007ead;
-		background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
-		background: -moz-linear-gradient(top,  #0095cc,  #00678e);
-	}
-
-	.result-item {
-		color: black;
-		width: 400px;
-		padding: 10px;
-		cursor: pointer;
-		border-radius: 10px;
-		/*border: 1px solid black;
-		border-bottom: none;
-		border-top: none;*/
-	}
-
-	.result-item:hover {
-		background-color: lightblue;
-		color: white;
-	}
-
-	/* Fixes submit button height problem in Firefox */
-	.tfbutton::-moz-focus-inner {
-	  border: 0;
-	}
-	.tfclear{
-		clear:both;
-	}
-
-	
-
-	.link {
-	  stroke: #ccc;
-	}
-
-	.node text {
-	  pointer-events: none;
-	  font: 10px sans-serif;
-	}
-
-	#displayResult {
-		border: 1px solid black;
-		width: 960px;
-		height: 500px;
-		/*margin-top: 20px;*/
-		position: relative;
-		top: 100px;
-		z-index: 0;
-	}
-
-
+  }
+  #search-results {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+    width: 420px;
+    height: 500px;
+  }
+  .input{
+    margin: 0;
+    margin-right: -4px;
+    padding: 5px;
+    width: 410px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    border: 1px solid #0076a3; border-right:0px;
+    border-top-left-radius: 5px 5px;
+    /*border-bottom-left-radius: 5px 5px;*/
+  }
+  .button {
+    margin: 0;
+    padding: 5px 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    outline: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: #ffffff;
+    border: solid 1px #0076a3; border-right:0px;
+    background: #0095cd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+    background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+    border-top-right-radius: 5px 5px;
+    border-bottom-right-radius: 5px 5px;
+  }
+  .button:hover {
+    text-decoration: none;
+    background: #007ead;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+    background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+  }
+  .result-item {
+    color: black;
+    width: 400px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    /*border: 1px solid black;
+    border-bottom: none;
+    border-top: none;*/
+  }
+  .result-item:hover {
+    background-color: lightblue;
+    color: white;
+  }
+  /* Fixes submit button height problem in Firefox */
+  .tfbutton::-moz-focus-inner {
+    border: 0;
+  }
+  .tfclear{
+    clear:both;
+  }
+  /*Used to draw node network*/
+  .link {
+    stroke: #ccc;
+  }
+  .node text {
+    pointer-events: none;
+    font: 10px sans-serif;
+  }
+  #displayResult {
+    border: 1px solid black;
+    width: 960px;
+    height: 500px;
+    /*margin-top: 20px;*/
+    position: relative;
+    top: 100px;
+    z-index: 0;
+  }
 </style>
 </head>
+
 <body>
-	<!-- HTML for SEARCH BAR -->
-	<div>
-		<form id="search">
-		  <input type="text" id="text-field" class="input" autocomplete="off">
-			<input type="submit" id="submit-button" value="search" class="button">
-		</form>
-	<div class="tfclear"></div>
-	</div>
-	<div id="result-container">
-		<div id="resultCount"></div>
-		<ul id = "search-results"></ul>
-	</div>
-	<div align="center" style="width:100%;">
-		<div id= "displayResult">
-	</div>
-	</div>
+  <!--HTML for Title/Heading-->
+  <div id="container" class="container">
+    <header>
+      <h1><center>Health Networks and Disparities</center></h1>
+      <p>This is an interactive web-based network tool that allows users to see which health conditions co-occur. Search for a health condition to view the network of diseases commonly diagnosed alongside it.</p>
+    </header>
 
-	<script type="text/javascript" src="d3.min.js"></script>
-	<!--<script type="text/javascript" src="d3.geom.js"></script>
-	<script type="text/javascript" src="d3.layout.js"></script>-->
-	<script type="text/javascript" src="jquery.js"></script>
-	<script src="ICD_CODES.js"></script>
-	<script src="icd9emily.js"></script>
-	<script src = "my5000Entries.js"></script>
-	<script src = "3digcodes.js"></script>
-	
+    <!--HTML for filters-->
+    <div id="filters">
+      <div id="race" class="control">
+        <h3>Race</h3>
+        <a id="white" class="active">White</a>
+        <a id="black">Black</a>
+        <a id="asian">Asian</a>
+        <a id="hispanic latino">Hispanic/Latino</a>
+      </div>
+      <div id="gender" class="control">
+        <h3>Gender</h3>
+        <a id="male" class="active">Male</a>
+        <a id="female">Female</a>
+      </div><br>
 
+    <!--HTML for formatted slider bar
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <h3>Age</h3>
+    <div class="slider">
+      <div class="emptyprogress"></div>
+      <div class="progress"></div>
+      <div class="indicator"></div>
+    </div>
+    <div class="info">
+      <label>
+        Value:
+        <input type="text" id="valueSlider" value="0"/>
+      </label>
+    </div>-->
+
+    <!--HTML for simple slider bar-->
+    <input type="range" min="0" max="50" value="0" step="5" onchange="showValue(this.value)" />
+    <span id="range">0</span>
+    <script type="text/javascript">
+    function showValue(newValue)
+    {
+      document.getElementById("range").innerHTML=newValue;
+    }
+    </script>
+    
+    <!-- HTML for SEARCH BAR -->
+    <div>
+      <form id="search">
+        <input type="text" id="text-field" class="input" autocomplete="off">
+        <input type="submit" id="submit-button" value="search" class="button">
+      </form>
+    <div class="tfclear"></div>
+    </div>
+    <div id="result-container">
+      <div id="resultCount"></div>
+      <ul id = "search-results"></ul>
+    </div>
+    <div align="center" style="width:100%;">
+    <div id= "displayResult">
+    </div>
+    </div>
+
+    <!--HTML for main CSV, include Nodes/Edges later-->
+      <div id="main" role="main">
+        <div id="vis">
+          <svg width="960" height="800">
+            <g id="edges"></g>  <!--fix coordinates-->
+            <g id="nodes"></g>  <!--fix coordinates-->
+          </svg>
+        </div>
+      </div>
+      <footer>
+        <p>
+          Data from Duke University Medical Systems. Note that this data is a subset of 21 million patient entries taken from 2007-2011. <br> DISCLAIMER: Although the data is relatively representative of the entire population, this tool cannot replace the advice of a health professional.
+        </p>
+      </footer>
+    </div>
+
+  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="jquery.js"></script>
+  <script src="ICD_CODES.js"></script>
+  <!--<script src="3digcodes.js"></script>-->
+  <script src="icd9.js"></script>
+  <script src = "my5000Entries.js"></script>
+  <script src = "3digcodes.js"></script>
+  
 </body>
 </html>
