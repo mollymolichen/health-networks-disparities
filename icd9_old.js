@@ -1,463 +1,455 @@
-//global vars
-//var myKeys = [];
-
-//find intersections of all string queries
-function boolSearch(){
-  var input = document.getElementById('text-field').value;
-  console.log('input: ' + input);
-  if(input.length == 0){
-    return [];
-  }
-
-  var res = input.toLowerCase();
-
-  if (res.indexOf(" ") > -1) {
-    var newKeys = res.split(" ");
-    var matchlist = [];
-
-    for (var a = 0; a < newKeys.length; a++) {
-      var nkey = newKeys[a];
-      if(nkey != ' '){
-        var eacharr = stringMatch(nkey);
-        matchlist.push(eacharr);
-      }
-    }
-    console.log('matchlist ', matchlist);
-
-    var emptyarr = [];
-    for (var b = 0; b < matchlist.length; b++) {
-      var eachele = matchlist[b];
-      emptyarr = emptyarr.concat(eachele);
-    }
-
-    var wordMap = {};
-    emptyarr.forEach(function(result){
-      if(!wordMap[result]){
-        wordMap[result] = 0;
-      }
-      wordMap[result]++;
-    });
-
-    var result = [];
-    for(var key in wordMap){
-      if(wordMap.hasOwnProperty(key)){
-        var numwords = newKeys.length;
-        var threshold = numwords > 2 ? numwords - 1 : 2;
-        if(wordMap[key] >= threshold){
-         result.push(key);
-        }
-      }
-    }
-
-    //  var nonunique = [];
-    //  var prev;
-    //  emptyarr.sort();
-    //  for (var i = 0; i < emptyarr.length; i++) {
-    //    if (emptyarr[i] == prev) {
-    //      nonunique.push(emptyarr[i]);
-    //    }
-    //    prev = emptyarr[i];
-    //  }
-    //
-    // retresult = $.unique(nonunique);
-    // displayRes(retresult);
-    // makeUnique(retresult);
-
-    displayRes(result);
-    makeUnique(result);
-
-  } else {
-    stringMatch(res);
-  }
-}
-
 //take user's string input and return list of matching codes
-function stringMatch(result) {
-  var newarr = [];
-  var myKeys = [];
-  for (var key in datalist) {
-    if (datalist.hasOwnProperty(key)) {
-      var val = datalist[key];
-      if (val.indexOf(result) > -1 || key.indexOf(result) > -1){
-        newarr.push(key + ":" + val);
-      }
-    }
-  }
+function stringMatch() {
+	var input = document.getElementById('text-field').value;
+	console.log('input: ' + input);
+	if(input.length == 0){
+		return [];
+	}
 
-  console.log('newarr: ', newarr);
+	var res = input.toLowerCase();
 
-  //makeUnique(newarr);
-  displayRes(newarr);
-  return newarr;
+	var newarr = [];
+	for (var key in datalist) {
+		if (datalist.hasOwnProperty(key)) {
+			var val = datalist[key];
+			if (val.indexOf(res) > -1 || key.indexOf(res) > -1){
+				newarr.push(key + ":" + val);
+			}
+		}
+	}
+
+	console.log('newarr: ', newarr);
+
+	var uniqueCodes = getUniqueCodes(newarr);
+	var hierarchyMap = hierarchy(uniqueCodes, newarr);
+	var listToDisplay = convertMapToList(uniqueCodes, hierarchyMap);
+
+	displayRes(listToDisplay);
+
+	return listToDisplay;
 }
 
-//take user's string input and return list of codes
-function stringMatch() {
-  var newarr = [];
-  var myKeys = [];
+//make array of all unique 3 digit codes from newarr
+function getUniqueCodes(codeArray) {
+	var uniquearr = [];
+	for (var j = 0; j< codeArray.length; j++) {
+		var eachval = codeArray[j];
+		var uniq = eachval.split(":")[0].split(".")[0];
 
-  /*var rawInput = document.getElementById('text-field').value;
-  console.log('input: ' + rawInput);
-  if(rawInput.length == 0){
-    return [];
-  }
 
-  var input = stemmer(rawInput, true);*/
+		if (uniquearr.indexOf(uniq) == -1) {
+			uniquearr.push(uniq);
+		}
+	}
+	//console.log('uniquearr', uniquearr);
+	return uniquearr;
+}
 
-  var input = document.getElementById('text-field').value;
-  console.log('input: ' + input);
-  if (input.length == 0){
-    return [];
-  }
+//sort results by number of occurrences in node list
+function sortOccurrences(resArr) {
+	var codeMap = {};		//make a hashmap with all the node ids in the node list as the keys
+							//and the number of times they occurred as values									
+	for (var each in myEntryNodes) {
+		if (myEntryNodes.hasOwnProperty(each)) {
+			var occurrence = parseInt(myEntryNodes[each].occurs); //occurrences are integers not strings
+			var nodeid = myEntryNodes[each].node_ID; //node ids are strings
+	 		if (!codeMap[nodeid]) {
+	 		 	codeMap[nodeid] = 0;
+	 		}
+	 		codeMap[nodeid] += occurrence;
+	 	}
+	}	
 
-  var res = input.toLowerCase();
-  for (var key in datalist) {
-    if (datalist.hasOwnProperty(key)) {
-      var val = datalist[key];
-      if (val.indexOf(res) > -1 || val.indexOf(key) > -1){ //if value matches search, word for word
-        newarr.push(key + " : " + val);
-        myKeys.push(key);
-      }
-    }
-  }
-  /*
-  //replaces above for loop as a search method
-  console.log("Your search for " + input + " returned:");
-  
-  var wordsInCommon = 0;
-  var threshold;
-  var inputArr = input.split(" ");
-  //console.log(inputArr);
-  for (var key in datalist){
-    if (datalist.hasOwnProperty(key)){
-      var val = datalist[key].replace(/\W+/g, " "); //value w/o special chars
-      //console.log(val);
-      var valArr = datalist[key].split(" ");        //for counting purposes
-      for (var i=0; i < inputArr.length; i++){
-        //console.log(inputArr[i]);
-        if (val.includes(inputArr[i])){ //try stemmer(inputArr[i]) 
-          wordsInCommon++;
-          //console.log("found a word in common!");
-        }
-      }
+	//for each diagnosis code in the input, make a list of the diagnosis code
+	//and the number of occurrences from the node list (ex. ["XXX:35", "YYY:2", etc.)
+	// Diagnosis XXX occurred in the node list 35 times, YYY occurred twice
+	///If code not in nodelist, number of occurrences = 0
+	var sortres = []; 
+	for (var i =0; i < resArr.length; i++) {
+		var index = resArr[i];
+		if (codeMap.hasOwnProperty(index)) {
+			var n = codeMap[index];
+			sortres.push(index + ":" + n);
+		} else {
+			sortres.push(index + ":" + 0);
+		}
+	}
 
-      threshold = Math.floor(0.25 * valArr.length); //Math.floor? Makes it harder to pass threshold
-      //console.log(threshold);
-      if (wordsInCommon >= threshold){
-        newarr.push(key + " : " + val);
-        //console.log("pushed");
-      }
-      wordsInCommon = 0; //reset
-    }
-  }*/
+	sortres.sort(
+		function(a,b) {
+			return b.split(":")[1] - a.split(":")[1]
+		});
+	
+	
+	var sorted = []; 
+	for (var j = 0; j < sortres.length; j++) {
+		var sortable = sortres[j];
+		sorted.push(sortable.split(":")[0]);
+	}
+	//console.log('sorted',sorted);
+	return sorted;
+}
 
-  console.log('newarr: ', newarr);
+function hierarchy(uniqueCodes, searchMatches) {
+	var hierarchyMap = {};
+	uniqueCodes.forEach(function(code) {
+		// var description;
+		// if(threedigitlist.hasOwnProperty(code)){
+		// 	description = code + ":" + threedigitlist[code];
+		// }
+		// else {
+		// 	console.log('Error: ' + code + ' does not exist.');
+		// 	return;
+		// }
+		var sectionList = [];
+		searchMatches.forEach(function(result) {
+			if (result.split(":")[0].split(".")[0].indexOf(code) > -1) {
+				sectionList.push(result);
+			}
+		});
 
-  //show how many results were found
-  var resultCount = document.getElementById('resultCount');
-  resultCount.innerText = newarr.length + ' results found';
+		// sort list
+		sectionList.sort(function(a,b){
+			var codeA = a.split(':')[0];
+			var codeB = b.split(':')[0];
+			var specificCodeA = codeA.split('.')[1];
+			var specificCodeB = codeB.split('.')[1];
+			return parseInt(specificCodeA, 10) - parseInt(specificCodeB, 10);
+		});
 
-  //remove previous displays on screen in order to update
-  var newList = document.getElementById("search-results");
-  while (newList.hasChildNodes()){
-  	newList.removeChild(newList.firstChild); //other version didn't have ;
-  }
+		// if you want the description in the code, uncomment the lines from 98-105 and replace
+		// 'code' in line 124 with 'description'
+		hierarchyMap[code] = sectionList;
+	});
 
-  //display list of matching results for user to select from
-  for (var i = 0; i < newarr.length; i++){
-  	(function(){
-  		var res = newarr[i];
-  		var info = res.split(":"); //keep this as an array so you can access more elements
-  		var key = info[0];				 //code
-  		var value = info[1];			//diagnosis - need to categorize
-  		var mod = '<strong>' + info[0] + '</strong>' + ' - ' + value[0].toUpperCase() + value.slice(1);
-  		var node = document.createElement("LI"); //create a list node
-  		var div = document.createElement("div"); //create a div element
-  		div.innerHTML = mod; //text that makes up 
-  		node.appendChild(div);
-  		div.className = 'result-item';
-  		document.getElementById('search-results').appendChild(node);
-  		node.addEventListener("click", function(){
-  			findCode(res);
-  		});
-  	}()); 
-  }
-  //return myKeys;
+	//console.log('hierarchyMap', hierarchyMap);
+	return hierarchyMap;
+
+}
+
+function convertMapToList(uniqueCodes, hierarchyMap) {
+	var sortedCodes = sortOccurrences(uniqueCodes);
+	var convertedList = [];
+	sortedCodes.forEach(function(code){
+		var subsection = hierarchyMap[code]; // this should be an array
+		subsection.forEach(function(result){
+			convertedList.push(result);
+		});
+	});
+	//console.log('convertedList', convertedList);
+	return convertedList;
 }
 
 //display how many results were found
 function displayRes(nArray) {
-  var resultCount = document.getElementById('resultCount');
-  resultCount.innerText = nArray.length + ' results found';
+	var resultCount = document.getElementById('resultCount');
+	resultCount.innerText = nArray.length + ' results found';
 
 //remove all previous displays on screen in order to update
-  var newList = document.getElementById("search-results");
-  while (newList.hasChildNodes()) {
-    newList.removeChild(newList.firstChild);
-  }
+	var newList = document.getElementById("search-results");
+	while (newList.hasChildNodes()) {
+		newList.removeChild(newList.firstChild);
+	}
 
 //display list of matching results for user to select from
-  for (var i = 0; i < nArray.length; i++) {
-    (function(){
-      var res = nArray[i];
-    var info = res.split(":");
-    var keycode = info[0];
-      var descrip = info[1];
-      var mod = '<strong>' + info[0] + '</strong>' + ' - '
-                  + descrip[0].toUpperCase() + descrip.slice(1);
+	for (var i = 0; i < nArray.length; i++) {
+		(function(){
+	    var res = nArray[i];
+		var info = res.split(":");
+		var keycode = info[0];
+	    var descrip = info[1];
+	    var mod = '<strong>' + info[0] + '</strong>' + ' - '
+									+ descrip[0].toUpperCase() + descrip.slice(1);
 
-      var node = document.createElement ("LI");  // create a list node
-      var div = document.createElement('div');  // create div element
-      div.innerHTML = mod;              //what text makes up link element
-      node.appendChild(div);            //put link into list node
-      div.className = 'result-item';
-      document.getElementById('search-results').appendChild(node);
-      node.addEventListener('click', function(){
-        findCode(res);
-      });
-    }());
-  }
-}
-/*function displayResults(){
-  //is splitword local? is input (from icd9.js) accessible? look into dynamic file loading if doesn't work
-  //see whether user input matches 25% of array entries
-  /*if (splitWord.length = 1){
-    if (input === splitWord[0]){
-      document.write(splitWord[0]); //document write is equivalent to displaying in search bar - format later
-    }
-  }
-  else { //search phrase has multiple words
-
-  }*/
- /* document.write("Your search for " + input + " returned: <br/>");
-  
-  var wordsInCommon = 0;
-  var threshold;
-  var inputArr = input.split(" ");
-
-  for (var key in datalist){
-    if (datalist.hasOwnProperty(key)){
-      var val = datalist[key].replace(/\W+/g, " "); //value w/o special chars
-      var valArr = datalist[key].split(" ");        //for counting purposes
-      for (var i=0; i < inputArr.length; i++){
-        if (key.includes(inputArr[i])){ //try stemmer(inputArr[i]) 
-          wordsInCommon++;
-        }
-      }
-
-      threshold = 0.25 * valArr.length;
-      if (wordsInCommon >= threshold){
-        newArr.push(datalist[key]);
-      }
-    }
-  }
-}*/
-
-//function to return unique integers of search results for subCategory sort/display purposes
-function resultCategories(myArray){
-
-  //var unfiltered = [];
-  //IF USING 3DIGIT LIST, DON'T NEED TO TRUNCATE
-  //place truncated entries into own array
-  /*for (var i = 0; i < myArray.length; i++){							 //V101.67 : Heart Disease
-    var key = myArray[i].split(":")[0];									 //V101.67
-    var roundedEntry = key.slice(0, key.indexOf("."));   //V101
-    unfiltered.push(roundedEntry);
-  }*/
-
-  //remove duplicates
-  var filtered = myArray.filter(function(item, pos){
-    return myArray.indexOf(item) == pos;
-  });
-  for (var item in filtered){
-  	document.write(filtered[item] + ", ");
-  }
-  var myMap = new Map();
-  //output
-  for (var i = 0; i < myArray.length; i++){
-       var code = myArray[i];
-              if (code == 0) return error;
-              if (code > 0 && code <= 139){
-                  subCategory = "Infections and Parasitic Diseases";
-                  category = "Integumentary System";
-              }
-              if (code >= 140 && code <= 239){
-                  subCategory = "Neoplasms";
-                  category = "Clinical Diagnostics";
-              }
-              if (code >= 240 && code <= 279){
-                  subCategory = "Endocrine, Nutritional and Metabolic Diseases, and Immunity Disorders";
-                  category = "Regulatory Systems";
-              }
-              if (code >= 280 && code <= 289){
-                  subCategory = "Diseases of the Blood and Blood-Forming Organs";
-                  category = "Circulatory/Respiratory Systems";
-              }
-              if (code >= 290 && code <= 319){
-                  subCategory = "Mental Disorders";
-                  category = "Nervous System and Psychological Disorders";
-              }
-              if (code >= 320 && code <= 389){
-                  subCategory = "Diseases of the Nervous System and Sense Organs";
-                  category = "Nervous System and Psychological Disorders";
-              }
-              if (code >= 390 && code <= 459){
-                  subCategory = "Diseases of the Circulatory System";
-                  category = "Circulatory/Respiratory Systems";
-              }
-              if (code >= 460 && code <= 519){
-                  subCategory = "Diseases of the Respiratory System";
-                  category = "Circulatory/Respiratory Systems";
-              }
-              if (code >= 520 && code <= 579){
-                  subCategory = "Diseases of the Digestive System";
-                  category = "Regulatory Systems";
-              }
-              if (code >= 580 && code <= 629){
-                  subCategory = "Diseases of the Genitourinary System";
-                  category = "Regulatory Systems";
-              }
-              if (code >= 630 && code <= 679){
-                  subCategory = "Complications of Pregnancy, Childbirth, and the Puerperium";
-                  category = "Reproductive System";
-              }
-              if (code >= 680 && code <= 709){
-                  subCategory = "Diseases of the Skin and Subcutaneous Tissue";
-                  category = "Integumentary System";
-              }
-              if (code >= 710 && code <= 739){
-                  subCategory = "Diseases of the Musculoskeletal System and Connective Tissue";
-                  category = "Integumentary System";
-              }
-              if (code >= 740 && code <= 759){
-                  subCategory = "Congenital Anomalies";
-                  category = "Reproductive System";
-              }
-              if (code >= 760 && code <= 779){
-                  subCategory = " Certain Conditions Originating in the Perinatal Period";
-                  category = "Reproductive System";
-              }
-              if (code >= 780 && code <= 799){
-                  subCategory = "Symptoms, Signs, and Ill-Defined Conditions";
-                  category = "Clinical Diagnostics";
-              }
-              if (code >= 800 && code <= 999){
-                  subCategory = "Injury and Poisoning";
-                  category = "Injury and Poisoning";
-              }
-              if (code.includes("E")){
-                  subCategory = "Supplementary Classification of External Causes of Injury and Poisoning";
-                  category = "Injury and Poisoning";
-              }
-              if (code.includes("V")){
-                  subCategory = "Supplementary Classification of Factors Influencing Health Status and Contact with Health Services";
-                  category = "Clinical Diagnostics";
-              }
-
-              //sort output
-              myMap.set(category, code);  //key = category, value = code(s) associated with category
-              //output
-              //document.write(category + ": " + filtered[i] + "\n");
-       }
-
-       //map is outputting the entry right after the last one in its category  fix
-       /*for (var [key, value] of myMap.entries()){
-       		document.write(key + ": " + value + "<br>");
-       } */
-
-       /*for (var value of myMap.values()){
-        	document.write(value + ", ");
-       }*/
-
-       /*for (var key of myMap.keys()){
-       		document.write(key + ": ");
-       		for (var value of myMap.values()){
-       				document.write(value + " ");
-       		}
-       }*/
-       //console.log(myMap.keys().length);
-       /*for (var i = 0; i < myMap.keys().length, i++){
-       		document.write(myMap.keys(i) + ": ");
-       		for (var j=0; j<myMap.keys(i), j++){
-       			document.write(myMap.values(j) + " ");
-       		}
-       }*/
-  }
-
-//make a link for each entry in newarr to display to user
-function makeLink(entry) {
-
+	    var node = document.createElement ("LI");  // create a list node
+	    var div = document.createElement('div');	// create div element
+	    div.innerHTML = mod;							//what text makes up link element
+	    node.appendChild(div);						//put link into list node
+	    div.className = 'result-item';
+	    document.getElementById('search-results').appendChild(node);
+			node.addEventListener('click', function(){
+				findCode(res);
+				$("#result-container").slideUp("fast");
+			});
+		}());
+	}
 }
 
 //take user chosen link and extract the numerical code
 function findCode(choice){
-  // '524.72:alveolar mandibular hyperplasia' => ['524.72', 'alveolar mandibular hyperplasia']
-  var numCode = choice.split(":")[0];
-  var decimalPos = numCode.indexOf(".");
-  var code = numCode.slice(0, decimalPos);
-  console.log(code);
-  codeMatch(code);
+	// '524.72:alveolar mandibular hyperplasia' => ['524.72', 'alveolar mandibular hyperplasia']
+	var numCode = choice.split(":")[0];
+	var decimalPos = numCode.indexOf(".");
+	var code = numCode.slice(0, decimalPos);
+	//console.log('code:', code);
+	codeMatch(code);
 }
 
-//match code to nodelist -> ultimately display local network
+//match user-selected code to nodelist 
 function codeMatch(threeDigCode) {
-//for (var node_ID in my5000Entries) {
-  //  if (nodelist.hasOwnProperty(node_ID)) {
-  //    var codeID = nodelist[node_ID];
-  //    if (codeID.indexOf(threeDigCode) > -1) {
-  //      var centralnode =
-  //    }
-  //  }
+	var targArr = [];
+	var sourceArr = [];
+	var nlinkList = [];
+	var resObj ={};
+	for (var obj in myEntryLinks) {
+		if (myEntryLinks.hasOwnProperty(obj)) {
+			var source = myEntryLinks[obj].source;
+	 		var targ = myEntryLinks[obj].target;
+	 		if (source.indexOf(threeDigCode) > -1) {
+				nlinkList.push(myEntryLinks[obj]);
+				targArr.push(myEntryLinks[obj].target);
+			}
+			if (targ.indexOf(threeDigCode) > -1) {
+				nlinkList.push(myEntryLinks[obj]);
+				sourceArr.push(myEntryLinks[obj].source);
+			}
+		}
+	}
 
-  //}
+	allNodes = targArr.concat(sourceArr);
+	allNodes.push(threeDigCode);
+	$.unique(allNodes);
+	// console.log('allNodes', allNodes);
+	// console.log('nlinkList', nlinkList);
+
+	var description = [];
+	allNodes.forEach(function(code) {
+		if(threedigitlist.hasOwnProperty(code)){
+			description.push(code + ":" + threedigitlist[code]);
+		}
+	});
+	//console.log('description',description);
+	
+	//assigning name and group number to local nodes
+	var tempArr = [];
+	for (i = 0; i < description.length; i ++) {
+		newObj = {};
+		newObj["name"] = description[i];
+		if (description[i].split(":")[0].indexOf(threeDigCode)> -1) {
+			newObj["group"] = 0;
+		} else {
+			newObj["group"]=1;
+		}
+
+		tempArr.push(newObj);
+	}
+
+	//defining weight of links
+	var newLinks = [];
+	for(var j = 0; j < nlinkList.length; j++) {
+		var node = nlinkList[j];
+		var nwObject = {};
+		var weight = 0;
+		for(var i = 0; i < myEntryLinks.length; i++) {
+			if(node.source == myEntryLinks[i].source
+				&& node.target == myEntryLinks[i].target) {
+				weight++;
+			}
+		}
+		nwObject.value = weight;
+		newLinks.push(nwObject);
+	}
+
+	//defining source and target of links as index of node list
+	
+	console.log('temparr', tempArr);
+	for (var j = 0; j <nlinkList.length; j++) {
+		var node = nlinkList[j];
+		var newObject = newLinks[j];
+		newObject["source"] = undefined;
+		newObject["target"] = undefined;
+
+		for (var k =0; k < tempArr.length; k++) {
+			var name = tempArr[k].name.split(":")[0];
+			// console.log('source:', node.source, 'target:', node.target);
+			if(!newObject['source'] && name == node.source){
+				newObject['source'] = k;
+			}
+			if(!newObject['target'] && name == node.target){
+				newObject['target'] = k;
+			}
+		}
+
+		newLinks[j] = newObject;
+	}
+	console.log('newLinks', newLinks);
+	// console.log('temparr', tempArr);
+
+	resObj["links"] = newLinks;
+	resObj["nodes"] = tempArr;
+	// console.log("resObj", resObj);
+	makeLocGraph (resObj);
 }
 
-//make array of all unique 3 digit codes from newarr
-function makeUnique(codeArray) {
-  var uniquearr = [];
-  for (var j = 0; j< codeArray.length; j++) {
-    var eachval = codeArray[j];
-    var uniq = eachval.split(":")[0].split(".")[0];
+function makeLocGraph(dataObject) {
+ 	//clear previous results
+ 	var prev = document.getElementById("displayResult");
+ 	while (prev.hasChildNodes()) {
+		prev.removeChild(prev.firstChild);
+	}
 
+    // console.log('object passed in', dataObject);
+    // Constants for the SVG
+	var width = 960,
+	    height = 700;
 
-    if (uniquearr.indexOf(uniq) == -1) {
-      uniquearr.push(uniq);
+	//Set up the colour scale
+	var color = d3.scale.category10();
+
+	//Set up the force layout
+	var force = d3.layout.force()
+	    .charge(-600)
+	    .linkDistance(250)
+	    .size([width, height]);
+
+	var node_drag = d3.behavior.drag()
+        .on("dragstart", dragstart)
+        .on("drag", dragmove)
+        .on("dragend", dragend);
+
+    function dragstart(d, i) {
+        force.stop() // stops the force auto positioning before you start dragging
     }
-  }
-  console.log('unique array ', uniquearr);
+
+    function dragmove(d, i) {
+        d.px += d3.event.dx;
+        d.py += d3.event.dy;
+        d.x += d3.event.dx;
+        d.y += d3.event.dy; 
+    }
+
+    function dragend(d, i) {
+        d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+        force.resume();
+    }
+
+    function releasenode(d) {
+        d.fixed = false; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+        force.resume();
+    }
+
+	//Append a SVG to the body of the html page. Assign this SVG as an object to svg
+	var svg = d3.select("#displayResult").append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+
+	var graph = dataObject;
+
+	//Creates the graph data structure out of the json data
+	force.nodes(graph.nodes)
+	    .links(graph.links)
+	    .start();
+
+	//Create all the line svgs but without locations yet
+	var link = svg.selectAll(".link")
+	    .data(graph.links)
+	    .enter().append("line")
+	    .attr("class", "link")
+	    .style("opacity", "1")
+	    .style("marker-end", "url(#suit)");
+
+	var node = svg.selectAll(".node")
+	    .data(graph.nodes)
+	    .enter().append("g")
+	    .attr("class", "node")
+
+	node.append("circle")
+	    .attr("r", 10)
+	    .style("fill", function (d) {
+	    return color(d.group);
+	})
+
+	.on('dblclick', releasenode)
+	.call(node_drag); 
+
+	node.append("text")
+	      .attr("dx", 15)
+	      .attr("dy", ".35em")
+	      .text(function(d) { return d.name });
+
+
+	//Now we are giving the SVGs co-ordinates - the force layout is generating the co-ordinates which this code is using to update the attributes of the SVG elements
+	force.on("tick", function () {
+	    link.attr("x1", function (d) {
+		        return d.source.x;
+		    })
+	        .attr("y1", function (d) {
+		        return d.source.y;
+		    })
+	        .attr("x2", function (d) {
+		        return d.target.x;
+		    })
+	        .attr("y2", function (d) {
+		        return d.target.y;
+		    });
+
+	        d3.selectAll("circle").attr("cx", function (d) {
+		        return d.x;
+		    })
+		        .attr("cy", function (d) {
+		        return d.y;
+		    });
+
+		    d3.selectAll("text").attr("x", function (d) {
+		        return d.x;
+		    })
+		        .attr("y", function (d) {
+		        return d.y;
+		    });
+		    node.each(collide(0.5));
+	});
+
+	//formatting arrows
+	svg.append("defs").selectAll("marker")
+    	.data(["suit", "licensing", "resolved"])
+  		.enter().append("marker")
+    	.attr("id", function(d) { return d; })
+    	.attr("viewBox", "0 -5 10 10")
+    	.attr("refX", 25)
+    	.attr("refY", 0)
+    	.attr("markerWidth", 8)
+    	.attr("markerHeight", 8)
+    	.attr("orient", "auto")
+  		.append("path")
+    	.attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
+    	.style("stroke", "#4679BD")
+    	.style("opacity", "2");
+
+    	//collision detection code
+    	var padding = 1, // separation between circles
+		    radius=10;
+
+		function collide(alpha) {
+		  var quadtree = d3.geom.quadtree(graph.nodes);
+		  return function(d) {
+		    var rb = 2*radius + padding,
+		        nx1 = d.x - rb,
+		        nx2 = d.x + rb,
+		        ny1 = d.y - rb,
+		        ny2 = d.y + rb;
+		    
+		    quadtree.visit(function(quad, x1, y1, x2, y2) {
+		      if (quad.point && (quad.point !== d)) {
+		        var x = d.x - quad.point.x,
+		            y = d.y - quad.point.y,
+		            l = Math.sqrt(x * x + y * y);
+		          if (l < rb) {
+		          l = (l - rb) / l * alpha;
+		          d.x -= x *= l;
+		          d.y -= y *= l;
+		          quad.point.x += x;
+		          quad.point.y += y;
+		        }
+		      }
+		      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+		    });
+		  };
+		}
 }
 
-//create an age slider
-/*$(document).on("ready", function(){
-    
-    function moveSlider(e){
-      e.preventDefault();
-      var pos = $(e.currentTarget).offset(),
-      posX = e.pageX - pos.left,
-      value = posX*100/$(e.currentTarget).outerWidth();
-      
-      if (posX >= 0 && posX <= $(e.currentTarget).outerWidth()){
-        $('slider > .progress').css('width', posX+'px');
-        $('.slider > .indicator').css('left', posX+'px');
-        $('#valueSlider').val(value);
-      }
-    }
 
-    $('.slider').on('mousedown', function(e) {
-      moveSlider(e);
-      $(this).on('mousemove', function(e){
-        moveSlider(e);
-      });
-    }).on('mouseup', function(){
-      $(this).off('mousemove');
-    });
-});*/
-
-//MAIN
 $('#search').submit(function(){
-  //var myArray = stringMatch();
-  //resultCategories(myArray);
-  boolSearch();
-  $('#result-container').slideDown('fast');
-  return false;
+	stringMatch();
+	$('#result-container').slideDown('fast');
+	return false;
 });
